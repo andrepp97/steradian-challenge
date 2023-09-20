@@ -70,6 +70,7 @@ const CarDrawer = ({ isOpen, onClose }) => {
                         title: 'Car Created',
                         description: `${carName} successfully created.`,
                         status: 'success',
+                        position: 'top',
                         isClosable: true,
                         duration: 4000,
                     })
