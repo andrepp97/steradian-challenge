@@ -57,6 +57,7 @@ const App = () => {
     useEffect(() => {
         getCars()
         getOrders()
+        localStorage.setItem("chakra-ui-color-mode", "dark")
     }, [])
 
     return (
