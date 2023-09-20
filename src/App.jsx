@@ -24,7 +24,7 @@ const App = () => {
     const { isOpen: isOrder, onOpen: openDialog, onClose: closeDialog } = useDisclosure()
     const { isOpen: isOpenRent, onOpen: openRent, onClose: closeRent } = useDisclosure()
     const [cars, setCars] = useState(null)
-    const [orders, setOrders] = useState(null)
+    const [orders, setOrders] = useState([])
     const [selected, setSelected] = useState(null)
 
     const getCars = () => {
@@ -50,26 +50,22 @@ const App = () => {
     useEffect(() => {
         getCars()
         getOrders()
-    }, [db])
-
-    useEffect(() => {
-        localStorage.setItem('chakra-ui-color-mode', 'dark')
     }, [])
 
     return (
         <Container py="10" maxW="container.xl">
-            <Navbar onOpen={onOpen} openRent={openRent} />
+            <Navbar onOpen={onOpen} openRent={openRent} orders={orders.length} />
             <Drawer isOpen={isOpen} onClose={onClose} />
             <MyOrder isOpen={isOpenRent} onClose={closeRent} orders={orders} />
             <OrderDialog isOpen={isOrder} onClose={closeDialog} item={selected} />
             <Grid
-                gap={6}
-                templateColumns='repeat(auto-fit, minmax(420px, 1fr))'
+                gap={4}
+                templateColumns="repeat(auto-fit, minmax(410px, 1fr))"
             >
                 {cars?.map(car => (
                     <GridItem
                         key={car.id}
-                        w='100%'
+                        w="100%"
                     >
                         <CustomCard
                             id={car.id}
