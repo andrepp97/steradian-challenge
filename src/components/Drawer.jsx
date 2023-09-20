@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import {
     Box, Flex,
@@ -24,14 +24,14 @@ import {
 import { db, storage } from "../lib/firebase"
 import { thousandSeparator } from '../helper'
 
-const CarDrawer = ({ isOpen, onClose }) => {
+const CarDrawer = ({ isOpen, onClose, isEdit, car }) => {
     const toast = useToast()
     const btnRef = useRef()
     const [carImg, setCarImg] = useState()
-    const [display, setDisplay] = useState()
-    const [carName, setCarName] = useState()
-    const [dayRate, setDayRate] = useState()
-    const [monthRate, setMonthRate] = useState()
+    const [display, setDisplay] = useState('')
+    const [carName, setCarName] = useState('')
+    const [dayRate, setDayRate] = useState('')
+    const [monthRate, setMonthRate] = useState('')
     const [loading, setLoading] = useState(false)
 
     const onImageChange = (event) => {
@@ -53,38 +53,72 @@ const CarDrawer = ({ isOpen, onClose }) => {
         try {
             setLoading(true)
 
-            const docRef = await addDoc(collection(db, "cars"), {
-                car_name: carName,
-                day_rate: dayRate,
-                month_rate: monthRate,
-                created_date: serverTimestamp(),
-            })
+            if (isEdit) {
+                await updateDoc(doc(db, "cars", car?.id), {
+                    car_name: carName,
+                    day_rate: dayRate,
+                    month_rate: monthRate,
+                })
+                toast({
+                    title: 'Car Updated',
+                    description: `${carName} successfully updated.`,
+                    status: 'success',
+                    position: 'top',
+                    isClosable: true,
+                    duration: 4000,
+                })
+                setLoading(false)
+                resetInput()
+                onClose()
+            } else {
+                const docRef = await addDoc(collection(db, "cars"), {
+                    car_name: carName,
+                    day_rate: dayRate,
+                    month_rate: monthRate,
+                    created_date: serverTimestamp(),
+                })
 
-            const imageRef = ref(storage, carName)
+                const imageRef = ref(storage, carName)
 
-            uploadBytes(imageRef, carImg)
-                .then(async (snapshot) => {
-                    const downloadURL = await getDownloadURL(snapshot.ref)
-                    await updateDoc(doc(db, "cars", docRef.id), { image: downloadURL })
-                    toast({
-                        title: 'Car Created',
-                        description: `${carName} successfully created.`,
-                        status: 'success',
-                        position: 'top',
-                        isClosable: true,
-                        duration: 4000,
+                uploadBytes(imageRef, carImg)
+                    .then(async (snapshot) => {
+                        const downloadURL = await getDownloadURL(snapshot.ref)
+                        await updateDoc(doc(db, "cars", docRef.id), { image: downloadURL })
+                        toast({
+                            title: 'Car Created',
+                            description: `${carName} successfully created.`,
+                            status: 'success',
+                            position: 'top',
+                            isClosable: true,
+                            duration: 4000,
+                        })
                     })
-                })
-                .catch(err => console.log(err))
-                .finally(() => {
-                    setLoading(false)
-                    resetInput()
-                    onClose()
-                })
+                    .catch(err => console.log(err))
+                    .finally(() => {
+                        setLoading(false)
+                        resetInput()
+                        onClose()
+                    })
+            }
         } catch (error) {
             console.log(error)
         }
     }
+
+    const isSaveDisabled = () => {
+        if (isEdit) return !carName || !dayRate || !monthRate
+        return !carImg || !carName || !dayRate || !monthRate
+    }
+
+    useEffect(() => {
+        if (isEdit && car) {
+            console.log('Masuk Effect Edit')
+            setDisplay(car.image)
+            setCarName(car.car_name)
+            setDayRate(car.day_rate)
+            setMonthRate(car.month_rate)
+        }
+    }, [car, isEdit])
 
     return (
         <Drawer
@@ -101,7 +135,7 @@ const CarDrawer = ({ isOpen, onClose }) => {
             <DrawerContent>
                 <DrawerCloseButton />
                 <DrawerHeader>
-                    Add New Car
+                    {isEdit ? "Edit" : "Add New"} Car
                 </DrawerHeader>
 
                 <DrawerBody>
@@ -111,17 +145,20 @@ const CarDrawer = ({ isOpen, onClose }) => {
                             {display && (
                                 <Image alt="preview" src={display} />
                             )}
-                            <Input
-                                p="1"
-                                type="file"
-                                accept="image/*"
-                                onChange={onImageChange}
-                            />
+                            {!isEdit && (
+                                <Input
+                                    p="1"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={onImageChange}
+                                />
+                            )}
                         </Box>
                         <Box>
                             <Text>Car Name *</Text>
                             <Input
                                 placeholder='Volkswagen'
+                                value={carName}
                                 onChange={e => setCarName(e.target.value)}
                             />
                         </Box>
@@ -154,7 +191,7 @@ const CarDrawer = ({ isOpen, onClose }) => {
                         colorScheme="teal"
                         onClick={saveCar}
                         isLoading={loading}
-                        isDisabled={!carImg || !carName || !dayRate || !monthRate}
+                        isDisabled={isSaveDisabled()}
                     >
                         SAVE
                     </Button>
@@ -167,6 +204,8 @@ const CarDrawer = ({ isOpen, onClose }) => {
 CarDrawer.propTypes = {
     isOpen: PropTypes.bool,
     onClose: PropTypes.func,
+    isEdit: PropTypes.bool,
+    car: PropTypes.any,
 }
 
 export default CarDrawer;

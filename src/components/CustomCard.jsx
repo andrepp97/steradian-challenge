@@ -6,6 +6,8 @@ import {
     Heading, Text,
     Flex, Box, Image, Card,
     CardBody, CardFooter,
+    Menu, MenuButton,
+    MenuList, MenuItem,
 } from '@chakra-ui/react'
 import {
     TimeIcon,
@@ -13,14 +15,15 @@ import {
     TriangleDownIcon,
     ExternalLinkIcon,
     RepeatClockIcon,
+    EditIcon,
     DeleteIcon,
+    ChevronDownIcon,
 } from '@chakra-ui/icons'
 import { thousandSeparator } from '../helper'
 
 const dateFormat = (date) => moment(date).format("DD MMM YYYY")
 
-const CustomCard = ({ id, item, onRentNow, deleteCar, cancelOrder, rented }) => {
-    console.log(item)
+const CustomCard = ({ id, item, onRentNow, deleteCar, editCar, cancelOrder, rented }) => {
     return (
         <Card
             direction={{ base: "column", sm: "row" }}
@@ -28,6 +31,28 @@ const CustomCard = ({ id, item, onRentNow, deleteCar, cancelOrder, rented }) => 
             variant="outline"
             bg="gray.700"
         >
+            {!rented ? (
+                <Menu>
+                    <MenuButton
+                        as={Button}
+                        variant="ghost"
+                        position="absolute"
+                        right={0}
+                        p={0}
+                    >
+                        <ChevronDownIcon />
+                    </MenuButton>
+                    <MenuList>
+                        <MenuItem onClick={() => editCar({ ...item, id })}>
+                            <EditIcon color="blue.300" mr={2} /> Edit
+                        </MenuItem>
+                        <MenuItem onClick={() => deleteCar(id)}>
+                            <DeleteIcon color="red.300" mr={2} /> Delete
+                        </MenuItem>
+                    </MenuList>
+                </Menu>
+            ) : null}
+
             <Image
                 src={rented ? item?.car.image : item?.image}
                 alt={rented ? item?.car?.car_name : item?.car_name}
@@ -105,15 +130,6 @@ const CustomCard = ({ id, item, onRentNow, deleteCar, cancelOrder, rented }) => 
                 </CardBody>
 
                 <CardFooter gap={2}>
-                    {!rented && (
-                        <Button
-                            colorScheme="red"
-                            variant="outline"
-                            onClick={() => deleteCar(id)}
-                        >
-                            <DeleteIcon />
-                        </Button>
-                    )}
                     <Button
                         w="full"
                         variant="solid"
@@ -132,6 +148,7 @@ CustomCard.propTypes = {
     id: PropTypes.string,
     item: PropTypes.object,
     onRentNow: PropTypes.func,
+    editCar: PropTypes.func || PropTypes.any,
     deleteCar: PropTypes.func || PropTypes.any,
     cancelOrder: PropTypes.func || PropTypes.any,
     rented: PropTypes.bool,

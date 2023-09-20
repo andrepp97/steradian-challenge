@@ -26,6 +26,7 @@ const App = () => {
     const [cars, setCars] = useState(null)
     const [orders, setOrders] = useState([])
     const [selected, setSelected] = useState(null)
+    const [isEdit, setIsEdit] = useState(false)
 
     const getCars = () => {
         onSnapshot(query(collection(db, "cars"), orderBy("created_date", "desc")), (snapshot) => setCars(snapshot.docs))
@@ -42,6 +43,12 @@ const App = () => {
         }
     }
 
+    const editCar = (car) => {
+        setSelected(car)
+        setIsEdit(true)
+        onOpen()
+    }
+
     const rentNow = (car) => {
         setSelected(car)
         openDialog()
@@ -55,7 +62,15 @@ const App = () => {
     return (
         <Container py="10" maxW="container.xl">
             <Navbar onOpen={onOpen} openRent={openRent} orders={orders.length} />
-            <Drawer isOpen={isOpen} onClose={onClose} />
+            <Drawer
+                isOpen={isOpen}
+                onClose={() => {
+                    setIsEdit(false)
+                    onClose()
+                }}
+                isEdit={isEdit}
+                car={selected}
+            />
             <MyOrder isOpen={isOpenRent} onClose={closeRent} orders={orders} />
             <OrderDialog isOpen={isOrder} onClose={closeDialog} item={selected} />
             <Grid
@@ -72,6 +87,7 @@ const App = () => {
                             item={car.data()}
                             onRentNow={rentNow}
                             deleteCar={deleteCar}
+                            editCar={editCar}
                         />
                     </GridItem>
                 ))}
