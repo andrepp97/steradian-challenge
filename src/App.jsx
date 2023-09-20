@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import {
     Container,
     Grid, GridItem,
-    useDisclosure
+    useDisclosure,
 } from '@chakra-ui/react'
 import {
     collection,
@@ -51,6 +51,10 @@ const App = () => {
         getCars()
         getOrders()
     }, [db])
+
+    useEffect(() => {
+        localStorage.setItem('chakra-ui-color-mode', 'dark')
+    }, [])
 
     return (
         <Container py="10" maxW="container.xl">
