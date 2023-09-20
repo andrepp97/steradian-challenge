@@ -39,7 +39,7 @@ const MyOrder = ({ isOpen, onClose, orders }) => {
             <DrawerContent>
                 <DrawerCloseButton />
                 <DrawerHeader>
-                    Your Orders
+                    My Orders
                 </DrawerHeader>
 
                 <DrawerBody>
