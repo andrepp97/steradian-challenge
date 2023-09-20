@@ -51,6 +51,7 @@ const OrderDialog = ({ isOpen, onClose, item }) => {
                 title: 'Order Created',
                 description: `You ordered ${item?.car_name} for a rent.`,
                 status: 'success',
+                position: 'top',
                 isClosable: true,
                 duration: 4000,
             })
