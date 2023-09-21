@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import {
     Box, Stack,
     Input, Text,
-    Radio, RadioGroup,
     Button, AlertDialog,
     AlertDialogBody,
     AlertDialogFooter,
@@ -25,7 +24,9 @@ const OrderDialog = ({ isOpen, onClose, item }) => {
     const cancelRef = useRef()
     const [type, setType] = useState('pickup')
     const [date, setDate] = useState('')
+    const [dropDate, setDropDate] = useState('')
     const [location, setLocation] = useState('')
+    const [dropLocation, setDropLocation] = useState('')
     const [loading, setLoading] = useState(false)
 
     const resetInput = () => {
@@ -41,10 +42,10 @@ const OrderDialog = ({ isOpen, onClose, item }) => {
                 car_id: item?.id,
                 car: item,
                 order_date: serverTimestamp(),
-                pickup_date: type == 'pickup' ? date : '',
-                dropoff_date: type == 'dropoff' ? date : '',
-                pickup_location: type == 'pickup' ? location : '',
-                dropoff_location: type == 'dropoff' ? location : '',
+                pickup_date: date,
+                dropoff_date: dropDate,
+                pickup_location: location,
+                dropoff_location: dropLocation,
             })
 
             toast({
@@ -91,26 +92,43 @@ const OrderDialog = ({ isOpen, onClose, item }) => {
                                 value={item?.car_name}
                             />
                         </Box>
-                        <RadioGroup onChange={setType} value={type}>
-                            <Stack direction='row' gap={4}>
-                                <Radio value='pickup'>Pick Up</Radio>
-                                <Radio value='dropoff'>Drop Off</Radio>
-                            </Stack>
-                        </RadioGroup>
                         <Box>
-                            <Text>{type == 'pickup' ? 'Pick Up' : 'Drop Off'} Date *</Text>
+                            <Text>Pickup Date *</Text>
                             <Input
                                 type="date"
+                                value={date}
                                 min={new Date().toISOString().split("T")[0]}
                                 placeholder={`Your ${type} date`}
-                                onChange={e => setDate(e.target.value)}
+                                onChange={e => {
+                                    setDate(e.target.value)
+                                    setDropDate(e.target.value)
+                                }}
                             />
                         </Box>
                         <Box>
-                            <Text>{type == 'pickup' ? 'Pick Up' : 'Drop Off'} Location *</Text>
+                            <Text>Dropoff Date *</Text>
                             <Input
-                                placeholder={`Your ${type} location`}
+                                type="date"
+                                value={dropDate}
+                                min={date ? new Date(date).toISOString().split("T")[0] : new Date().toISOString().split("T")[0]}
+                                placeholder={`Your ${type} date`}
+                                onChange={e => setDropDate(e.target.value)}
+                            />
+                        </Box>
+                        <Box>
+                            <Text>Pickup Location *</Text>
+                            <Input
+                                value={location}
+                                placeholder={`Your Pickup location`}
                                 onChange={e => setLocation(e.target.value)}
+                            />
+                        </Box>
+                        <Box>
+                            <Text>Dropoff Location *</Text>
+                            <Input
+                                value={dropLocation}
+                                placeholder={`Your Dropoff location`}
+                                onChange={e => setDropLocation(e.target.value)}
                             />
                         </Box>
                     </Stack>
