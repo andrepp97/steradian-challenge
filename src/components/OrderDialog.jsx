@@ -22,7 +22,6 @@ import { db } from '../lib/firebase'
 const OrderDialog = ({ isOpen, onClose, item }) => {
     const toast = useToast()
     const cancelRef = useRef()
-    const [type, setType] = useState('pickup')
     const [date, setDate] = useState('')
     const [dropDate, setDropDate] = useState('')
     const [location, setLocation] = useState('')
@@ -31,8 +30,9 @@ const OrderDialog = ({ isOpen, onClose, item }) => {
 
     const resetInput = () => {
         setDate('')
+        setDropDate('')
         setLocation('')
-        setType('pickup')
+        setDropLocation('')
     }
 
     const onOrder = async () => {
@@ -98,7 +98,6 @@ const OrderDialog = ({ isOpen, onClose, item }) => {
                                 type="date"
                                 value={date}
                                 min={new Date().toISOString().split("T")[0]}
-                                placeholder={`Your ${type} date`}
                                 onChange={e => {
                                     setDate(e.target.value)
                                     setDropDate(e.target.value)
@@ -111,7 +110,6 @@ const OrderDialog = ({ isOpen, onClose, item }) => {
                                 type="date"
                                 value={dropDate}
                                 min={date ? new Date(date).toISOString().split("T")[0] : new Date().toISOString().split("T")[0]}
-                                placeholder={`Your ${type} date`}
                                 onChange={e => setDropDate(e.target.value)}
                             />
                         </Box>
