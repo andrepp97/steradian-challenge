@@ -128,7 +128,6 @@ const CarDrawer = ({ isOpen, onClose, isEdit, car }) => {
 
     useEffect(() => {
         if (isEdit && car) {
-            console.log('Masuk Effect Edit')
             setDisplay(car.image)
             setCarName(car.car_name)
             setDayRate(car.day_rate)
