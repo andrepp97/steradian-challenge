@@ -49,59 +49,75 @@ const CarDrawer = ({ isOpen, onClose, isEdit, car }) => {
         setMonthRate('')
     }
 
+    const validateDailyRate = () => {
+        return parseInt(dayRate) > parseInt(monthRate);
+    }
+
     const saveCar = async () => {
-        try {
-            setLoading(true)
+        if (validateDailyRate()) {
+            toast({
+                title: 'Warning',
+                description: 'Daily Rate tidak boleh melebihi Monthly Rate',
+                status: 'error',
+                position: 'top',
+                isClosable: true,
+                duration: 4000,
+            })
+            return;
+        } else {
+            try {
+                setLoading(true)
 
-            if (isEdit) {
-                await updateDoc(doc(db, "cars", car?.id), {
-                    car_name: carName,
-                    day_rate: dayRate,
-                    month_rate: monthRate,
-                })
-                toast({
-                    title: 'Car Updated',
-                    description: `${carName} successfully updated.`,
-                    status: 'success',
-                    position: 'top',
-                    isClosable: true,
-                    duration: 4000,
-                })
-                setLoading(false)
-                resetInput()
-                onClose()
-            } else {
-                const docRef = await addDoc(collection(db, "cars"), {
-                    car_name: carName,
-                    day_rate: dayRate,
-                    month_rate: monthRate,
-                    created_date: serverTimestamp(),
-                })
+                if (isEdit) {
+                    await updateDoc(doc(db, "cars", car?.id), {
+                        car_name: carName,
+                        day_rate: dayRate,
+                        month_rate: monthRate,
+                    })
+                    toast({
+                        title: 'Car Updated',
+                        description: `${carName} successfully updated.`,
+                        status: 'success',
+                        position: 'top',
+                        isClosable: true,
+                        duration: 4000,
+                    })
+                    setLoading(false)
+                    resetInput()
+                    onClose()
+                } else {
+                    const docRef = await addDoc(collection(db, "cars"), {
+                        car_name: carName,
+                        day_rate: dayRate,
+                        month_rate: monthRate,
+                        created_date: serverTimestamp(),
+                    })
 
-                const imageRef = ref(storage, carName)
+                    const imageRef = ref(storage, carName)
 
-                uploadBytes(imageRef, carImg)
-                    .then(async (snapshot) => {
-                        const downloadURL = await getDownloadURL(snapshot.ref)
-                        await updateDoc(doc(db, "cars", docRef.id), { image: downloadURL })
-                        toast({
-                            title: 'Car Created',
-                            description: `${carName} successfully created.`,
-                            status: 'success',
-                            position: 'top',
-                            isClosable: true,
-                            duration: 4000,
+                    uploadBytes(imageRef, carImg)
+                        .then(async (snapshot) => {
+                            const downloadURL = await getDownloadURL(snapshot.ref)
+                            await updateDoc(doc(db, "cars", docRef.id), { image: downloadURL })
+                            toast({
+                                title: 'Car Created',
+                                description: `${carName} successfully created.`,
+                                status: 'success',
+                                position: 'top',
+                                isClosable: true,
+                                duration: 4000,
+                            })
                         })
-                    })
-                    .catch(err => console.log(err))
-                    .finally(() => {
-                        setLoading(false)
-                        resetInput()
-                        onClose()
-                    })
+                        .catch(err => console.log(err))
+                        .finally(() => {
+                            setLoading(false)
+                            resetInput()
+                            onClose()
+                        })
+                }
+            } catch (error) {
+                console.log(error)
             }
-        } catch (error) {
-            console.log(error)
         }
     }
 
