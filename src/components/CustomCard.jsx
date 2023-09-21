@@ -42,7 +42,7 @@ const CustomCard = ({ id, item, onRentNow, deleteCar, editCar, cancelOrder, rent
                     >
                         <ChevronDownIcon />
                     </MenuButton>
-                    <MenuList>
+                    <MenuList w="fit-content">
                         <MenuItem onClick={() => editCar({ ...item, id })}>
                             <EditIcon color="blue.300" mr={2} /> Edit
                         </MenuItem>
@@ -87,7 +87,7 @@ const CustomCard = ({ id, item, onRentNow, deleteCar, editCar, cancelOrder, rent
                             </Text>
                         </Box>
                     </Flex>
-                    {rented && (
+                    {rented ? (
                         <>
                             <Divider mt={2} />
                             <Flex gap={3} direction="column" mt={3}>
@@ -126,7 +126,7 @@ const CustomCard = ({ id, item, onRentNow, deleteCar, editCar, cancelOrder, rent
                                 </Box>
                             </Flex>
                         </>
-                    )}
+                    ) : null}
                 </CardBody>
 
                 <CardFooter gap={2}>

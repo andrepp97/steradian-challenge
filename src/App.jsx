@@ -76,7 +76,10 @@ const App = () => {
             <OrderDialog isOpen={isOrder} onClose={closeDialog} item={selected} />
             <Grid
                 gap={4}
-                templateColumns="repeat(auto-fit, minmax(410px, 1fr))"
+                templateColumns={{
+                    base: "repeat(1, 1fr)",
+                    lg: "repeat(auto-fit, minmax(410px, 1fr))"
+                }}
             >
                 {cars?.map(car => (
                     <GridItem
